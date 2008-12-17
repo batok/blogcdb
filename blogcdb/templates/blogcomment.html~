@@ -1,0 +1,66 @@
+    <style type="text/css">
+        #encabezadoTabla
+        {
+            font-size: 10px;
+            text-align: center;
+            background-color: #C0C0C0;
+        }
+        #odd
+        {
+            background-color= #FFFFFF;
+        }
+        #even
+        {
+            background-color= #DDDDDD;
+        }
+    </style>
+<style type="text/css">
+        @import "static/javascript/dojo/dijit/themes/tundra/tundra.css";
+        @import "static/javascript/dojo/dojo/resources/dojo.css";
+        @import "static/javascript/dojo/dojox/image/resources/image.css";
+    </style>
+           <script type="text/javascript" src="static/javascript/dojo/dojo/dojo.js" 
+                     djConfig="parseOnLoad: true"></script>
+             <script type="text/javascript">
+                     dojo.require("dojo.parser");
+                     dojo.require("dijit.form.DateTextBox");
+                     dojo.require("dijit.form.TextBox");
+                     dojo.require("dijit.form.Button");
+                     dojo.require("dijit.Editor");
+                     function check_editor(evt) {
+                         content = dijit.byId('contenido').getValue(false);
+                         if (! content) {
+                              // you can easily replace this with a nicer dojo Dialog
+                             alert("Error! Llene el contenido primero!");
+                             // prevent the form from submitting
+                             evt.preventDefault(); 
+                         }
+                         dojo.byId('content_field').value = content;
+                     }
+ 
+                     function connect_form() {
+                         dojo.connect(dojo.byId('my_form'), 'onsubmit', check_editor);
+                     }
+ 
+                    dojo.addOnLoad(connect_form);
+
+             </script>
+
+</head>
+<body class="tundra">
+<a href="/" style="font-size: 10px">Regresar al Men&uacute; Principal</a>
+<h3 style="text-align: center; font-size: 14px;" >Bit&aacute;cora Iclar ( blog )</h3>
+<h4 style="text-align: center; font-size: 12px;" >Agregar Comentario sobre Mensaje</h4>
+<span align="center">
+<form method="post" action="savecomment" id="my_form">
+<input type="hidden" name="content_field" id="content_field"  />
+<input type="hidden" name="postid" value="${postid}"  />
+<table align="center">
+<tr><td>Comentario</td><td>
+<textarea id="contenido" dojoType="dijit.Editor" name="contenido" jsId="contenido" />
+</td></tr>
+<tr><td colspan="2" align="center"><input type="submit" id="correcto" dojoType="dijit.form.Button" name="correcto" label="Datos Correctos" iconClass="plusIcon" /></td></tr>
+</table>
+</form>
+</span>
+</body></html>

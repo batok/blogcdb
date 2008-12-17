@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="master.html" />
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
+  <title>Welcome to a blog which uses couchdb and tg2</title>
+    <style type="text/css">
+        #encabezadoTabla
+        {
+            font-size: 10px;
+            text-align: center;
+            background-color: #C0C0C0;
+        }
+        #odd
+        {
+            background-color= #FFFFFF;
+        }
+        #even
+        {
+            background-color= #EFD7EF;
+        }
+    </style>
+<style type="text/css">
+  .box {
+    margin-top: 10px;
+    color: #292929;
+    width: 300px;
+    border: 1px solid #BABABA;
+    background-color: #ddd;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 10px;
+    margin-bottom: 1em;
+    -o-border-radius: 10px;
+    -moz-border-radius: 12px;
+    -webkit-border-radius: 10px;
+    -webkit-box-shadow: 0px 3px 7px #adadad;
+    border-radius: 10px;
+    -moz-box-sizing: border-box;
+    -opera-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -khtml-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+</style>
+<style type="text/css">
+		
+		#content {
+			height:300px;
+			border-left:1px solid #333;
+			border-right:1px solid #333;
+		}
+		
+		#container {
+			top:100px;
+			width:720px;
+			margin:0 auto;
+		}
+		#headerx {
+			position:relative;
+			height:71px;
+			border-bottom:1px solid #dedede;
+		}
+		#todosLink, #miosLink, #nuevoLink, #comentarLink, #adjuntarLink, #menuLink{
+			background:#dedede;
+			position:absolute;
+			bottom:0;
+			width:100px;
+			padding:0;
+			cursor:pointer;
+		}
+		#todosLink{
+			left:20px;
+		}
+		#miosLink{
+			left:130px;
+		}
+		#nuevoLink{
+			left:240px;
+		}
+		#comentarLink{
+			left:350px;
+		}
+		#adjuntarLink{
+			left:460px;
+		}
+		#menuLink {
+			left:570px;
+		}
+		.fisheyeTarget {
+			position:relative;
+			bottom:0;
+			left:0;
+			height:1px;
+			width:1px;
+			cursor:pointer;
+		}
+		.inner {
+			cursor:pointer;
+			position:absolute;
+			bottom:5px;
+			margin-left:10px;
+		}
+		.subtext {
+			visibility:hidden;
+			position:absolute;
+			bottom:27px;
+			left:10px;
+			font:8pt Arial,sans-serif;
+			color:#666;
+		}
+		.cpContent {
+			padding:15px;
+		}
+		.cp {
+			background:#bebebe;
+			color:#666;
+		}
+	</style>
+<style type="text/css">
+        @import "/javascript/dijit/themes/tundra/tundra.css";
+        @import "/javascript/dojo/resources/dojo.css";
+        @import "/javascript/dojox/image/resources/image.css";
+</style>
+<script type="text/javascript">
+		var djConfig = {  parseOnLoad:true };
+	</script>
+           <script type="text/javascript" src="/javascript//dojo/dojo.js" >
+                    </script>
+           <script type="text/javascript" src="/javascript//dojox/widget/FisheyeLite.js"></script>
+          
+             <script type="text/javascript">
+		var LOGIN = "${tg.session.get("login","")}";
+		var LOGIN = "TEST";
+		var POSTID = "${postid}";
+		var AUTHOR = "${author}";
+                     dojo.require("dojo.parser");
+                     dojo.require("dijit.Dialog");
+                     dojo.require("dijit.form.TextBox");
+                     dojo.require("dijit.form.Button");
+                     dojo.require("dijit.Editor");
+		     dojo.require("dojox.widget.FisheyeLite");
+		     dojo.require("dojox.fx.easing");
+
+                     function preguntartag(){ 
+                       dijit.byId("dialog1").show();
+                     } 
+
+                     function agregartag(postid){ 
+			window.location = "addtag?postid=" + postid + "&amp;tag=" + escape(dojo.byId("tag").value);
+                     } 
+
+                     function inicio(){
+				dojo.query(".headLink").forEach(function(n){
+				var widget = new dojox.widget.FisheyeLite({
+					properties: {
+						height:65
+					},
+					easeOut:dojox.fx.easing.bounceOut,
+					durationOut:700
+				},n);
+				var myTarget = dojo.query(".subtext",n)[0];
+				if(myTarget){
+					dojo.style(myTarget,{ opacity:"0", visibility:"visible" });
+					var _anim = null;
+					dojo.connect(widget,"show",function(e){
+						if(_anim) if( _anim.status) _anim.stop();
+						_anim = dojo.fadeIn({ node: myTarget, duration:250 });
+						_anim.play();
+					});
+					dojo.connect(widget,"hide",function(e){
+						if(_anim) if( _anim.status) _anim.stop();
+						_anim = dojo.fadeOut({ node: myTarget, duration:250 });
+						_anim.play();
+					});
+				}
+				dojo.connect(n,"onclick",function(e){	
+					var id = dojo.attr(n,"id");
+					if ( id == "todosLink" ){
+						window.location = "postlist"
+					}	
+					if ( id == "miosLink" ){
+						window.location = "postlist?by_author=" + LOGIN;
+					}	
+					if ( id == "menuLink" ){
+						window.location = "/"
+					}	
+					if ( id == "nuevoLink" ){
+						window.location = "blogpost"
+					}	
+					if ( id == "comentarLink" ){
+						window.location = "blogcomment?postid=" + POSTID;
+					}	
+					if ( id == "adjuntarLink") if( LOGIN == AUTHOR ) window.location = "blogupload?postid=" + POSTID;
+				});
+				
+			});
+		     }
+
+		function oops(){
+			alert("oops");
+		}
+		dojo.addOnLoad(inicio);
+             </script>
+
+
+</head>
+<body class="tundra">
+<div dojoType="dijit.Dialog" id="dialog1" title="Agregando un Tag" jsId="dialog1"  >
+ <div>Digite Tag o Categor&iacute;a
+	<div id="tag" dojoType="dijit.form.TextBox" uppercase="true" style="width: 120px" />
+	<button dojoType="dijit.form.Button" id="hazlo" onclick="agregartag('${postid}')">Ok</button>
+ </div>
+</div>
+<div id="container">
+			<div id="headerx">
+
+				<div class="headLink" id="todosLink">
+					<div class="fisheyeTarget"></div>
+					<div class="inner">All</div>
+					<span class="subtext">Posts from anyone</span>
+				</div>
+				<div class="headLink" id="miosLink">
+					<div class="fisheyeTarget"></div>
+					<div class="inner">Mine</div>
+
+					<span class="subtext">My Blog posts</span>
+				</div>
+				<div class="headLink" id="nuevoLink">
+					<div class="fisheyeTarget"></div>
+					<div class="inner">New</div>
+					<span class="subtext">New Post</span>
+				</div>
+				<div class="headLink" id="comentarLink">
+					<div class="fisheyeTarget"></div>
+					<div class="inner">Comment</div>
+					<span class="subtext">Comment about...</span>
+				</div>
+				<div class="headLink" id="adjuntarLink">
+					<div class="fisheyeTarget"></div>
+					<div class="inner">Attach file</div>
+					<span class="subtext">Attach a file to this post</span>
+				</div>
+				<div class="headLink" id="menuLink">
+					<div class="fisheyeTarget"></div>
+					<div class="inner">Home</div>
+					<span class="subtext">Home</span>
+				</div>
+
+			</div>
+	</div>
+<h3 id="blogtitle" style="text-align: center; font-size: 16px;" >Blog</h3>
+<table>
+<tr><td>Author</td><td class="box" style="color: blue; background-color: #C0C0C0">${XML(gravatar)} $author</td></tr>
+<tr><td>Date</td><td>$postdate</td></tr>
+<tr><td>Subject</td><td>$subject</td></tr>
+<tr><td valign="top">Body</td><td class="box">${XML(postcontent)}</td></tr>
+<tr><td valign="top">Tags</td><td style="color: red">${"::".join(tags)}</td></tr>
+<tr py:if="tg.session.get('login', '') == author"><td>&nbsp;</td><td><button dojoType="dijit.form.Button" onclick="preguntartag()" style="size: 2px; color: #000000">Agregar Tag</button></td></tr>  
+<span py:if="len(attachments) >0">
+<tr><td colspan="2" align="left" valign="top">Attachments</td></tr>
+<tr py:for="indice, attachment in enumerate(attachments)"><td>&nbsp;</td>
+<td>${attachment}</td>
+</tr>
+</span>
+<span py:if="len(comments) >0">
+<tr><td colspan="2" align="left" valign="top">Comments</td></tr>
+<tr py:for="comment in comments"><td>&nbsp;</td><td><hr/>${XML(comment["gravatar"])}&nbsp;${comment["comment_author"]}&nbsp;${comment["comment_date"]}<br/>${comment["comment"]}</td></tr>
+</span>
+</table>
+</body></html>

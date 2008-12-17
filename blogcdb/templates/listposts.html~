@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="master.html" />
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
+  <title>Welcome to a blog which uses couchdb and tg2</title>
+<style type="text/css">
+        #encabezadoTabla
+        {
+            font-size: 10px;
+            text-align: center;
+            background-color: #C0C0C0;
+        }
+        #odd
+        {
+            background-color= #FFFFFF;
+        }
+        #even
+        {
+            background-color= #DD55DD;
+        }
+</style>
+<style type="text/css">
+		
+		#content {
+			height:300px;
+			border-left:1px solid #333;
+			border-right:1px solid #333;
+		}
+		
+		#container {
+			top:100px;
+			width:720px;
+			margin:0 auto;
+		}
+		#headerx {
+			position:relative;
+			height:71px;
+			border-bottom:1px solid #dedede;
+		}
+		#todosLink, #miosLink, #nuevoLink, #comentarLink, #adjuntarLink, #menuLink{
+			background:#dedede;
+			position:absolute;
+			bottom:0;
+			width:100px;
+			padding:0;
+			cursor:pointer;
+		}
+		#todosLink{
+			left:20px;
+		}
+		#miosLink{
+			left:130px;
+		}
+		#nuevoLink{
+			left:240px;
+		}
+		#comentarLink{
+			left:350px;
+		}
+		#adjuntarLink{
+			left:460px;
+		}
+		#menuLink {
+			left:570px;
+		}
+		.fisheyeTarget {
+			position:relative;
+			bottom:0;
+			left:0;
+			height:1px;
+			width:1px;
+			cursor:pointer;
+		}
+		.inner {
+			cursor:pointer;
+			position:absolute;
+			bottom:5px;
+			margin-left:10px;
+		}
+		.subtext {
+			visibility:hidden;
+			position:absolute;
+			bottom:27px;
+			left:10px;
+			font:8pt Arial,sans-serif;
+			color:#666;
+		}
+		.cpContent {
+			padding:15px;
+		}
+		.cp {
+			background:#bebebe;
+			color:#666;
+		}
+	</style>
+<style type="text/css">
+        @import "javascript/dijit/themes/tundra/tundra.css";
+        @import "javascript/dojo/resources/dojo.css";
+        @import "javascript/dojox/image/resources/image.css";
+    </style>
+<script type="text/javascript">
+		var djConfig = {  parseOnLoad:true };
+	</script>
+           <script type="text/javascript" src="javascript/dojo/dojo.js" >
+                    </script>
+           <script type="text/javascript" src="javascript/dojox/widget/FisheyeLite.js"></script>
+             <script type="text/javascript">
+		var  AUTHOR = "${tg.session.get('login','')}";
+                     dojo.require("dojo.parser");
+                     dojo.require("dijit.form.DateTextBox");
+                     dojo.require("dojo.data.ItemFileReadStore");			
+                     dojo.require("dijit.form.FilteringSelect");			
+                     dojo.require("dijit.form.TextBox");
+                     dojo.require("dijit.form.Button");
+		     dojo.require("dojox.widget.FisheyeLite");
+		     dojo.require("dojox.fx.easing");
+		     function ir(){
+			author = "";
+			if ( AUTHOR != "" ){
+				author = "&amp;by_author=" + AUTHOR;
+			}
+			window.location = "postlist?tag=" + eltag.getValue() + author ;
+		     }		
+                     function inicio(){
+				dojo.query(".headLink").forEach(function(n){
+				var widget = new dojox.widget.FisheyeLite({
+					properties: {
+						height:65
+					},
+					easeOut:dojox.fx.easing.bounceOut,
+					durationOut:700
+				},n);
+				var myTarget = dojo.query(".subtext",n)[0];
+				if(myTarget){
+					dojo.style(myTarget,{ opacity:"0", visibility:"visible" });
+					var _anim = null;
+					dojo.connect(widget,"show",function(e){
+				         if ( _anim ) if( _anim.status )  _anim.stop();
+						_anim = dojo.fadeIn({ node: myTarget, duration:250 });
+						_anim.play();
+					});
+					dojo.connect(widget,"hide",function(e){
+				         if ( _anim ) if( _anim.status )  _anim.stop();
+						_anim = dojo.fadeOut({ node: myTarget, duration:250 });
+						_anim.play();
+					});
+				}
+				dojo.connect(n,"onclick",function(e){	
+					var id = dojo.attr(n,"id");
+					if ( id == "todosLink" ){
+						window.location = "postlist"
+					}	
+					if ( id == "miosLink" ){
+						window.location = "postlist?by_author=" + AUTHOR;
+					}	
+					if ( id == "menuLink" ){
+						window.location = "/"
+					}	
+					if ( id == "nuevoLink" ){
+						window.location = "blogpost"
+					}	
+					if ( id == "comentarLink" ){
+						alert("En construccion");
+					}	
+					if ( id == "adjuntarLink" ){
+						alert("En construccion");
+					}	
+				});
+				
+			});
+		     }
+		dojo.addOnLoad(inicio);
+
+             </script>
+
+</head>
+<body class="tundra">
+<div id="container">
+			<div id="headerx">
+
+				<div class="headLink" id="todosLink">
+					<div class="fisheyeTarget"></div>
+					<div class="inner">All</div>
+					<span class="subtext">Posts from anyone</span>
+				</div>
+				<div class="headLink" id="miosLink">
+					<div class="fisheyeTarget"></div>
+					<div class="inner">Mine</div>
+
+					<span class="subtext">My Posts</span>
+				</div>
+				<div class="headLink" id="nuevoLink">
+					<div class="fisheyeTarget"></div>
+					<div class="inner">New</div>
+					<span class="subtext">New Post</span>
+				</div>
+				<div class="headLink" id="comentarLink">
+					<div class="fisheyeTarget"></div>
+					<div class="inner">Next </div>
+					<span class="subtext">List next posts (${newindex})</span>
+				</div>
+				<div class="headLink" id="adjuntarLink">
+					<div class="fisheyeTarget"></div>
+					<div class="inner">Previous</div>
+					<span class="subtext">List previous posts</span>
+				</div>
+				<div class="headLink" id="menuLink">
+					<div class="fisheyeTarget"></div>
+					<div class="inner">Home</div>
+					<span class="subtext">Home</span>
+				</div>
+
+			</div>
+	</div>
+<h3 id="blogtitle" style="text-align: center; font-size: 16px;" >My blog</h3>
+<h4 style="text-align: center; font-size: 12px;" py:if="not by_author">Recent Posts</h4>
+<h4 style="text-align: center; font-size: 12px;" py:if="by_author">Mis Mensajes Recientes (${by_author})</h4>
+<h4 style="text-align: center; font-size: 8px;" py:if="tag">Tag : ${tag}</h4>
+<div dojoType="dojo.data.ItemFileReadStore" url="tags" jsId="tagstore" />
+<center><input py:if="not tag" dojoType="dijit.form.FilteringSelect" searchAttr="blogtag" name="tag" store="tagstore" autocomplete="true" align="center" onChange="ir()" jsId="eltag" /></center>
+<center><input py:if="tag" dojoType="dijit.form.FilteringSelect" searchAttr="blogtag" name="tag" store="tagstore" autocomplete="true" align="center" onChange="ir()" jsId="eltag" displayedValue="${tag}" /></center>
+<table align="center" cellspacing="5">
+<tr py:for="i, post in enumerate(posts)" class="${i%2 and 'odd' or 'even'}"><td><a href="getpost?postid=${post['postid']}">${i + 1}</a></td><td py:if="not by_author">${XML(post["gravatar"])}  ${post["author"]}</td><td>${post["postdate"]}</td><td>${post["subject"]}</td></tr>
+</table>
+</body></html>
