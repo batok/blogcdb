@@ -17,33 +17,33 @@ def setup_app(command, conf, vars):
     model.metadata.create_all(bind=config['pylons.app_globals'].sa_engine)
 
     u = model.User()
-    u.user_name = u'manager'
-    u.display_name = u'Example manager'
-    u.email_address = u'manager@somedomain.com'
-    u.password = u'managepass'
+    u.user_name = u'joe'
+    u.display_name = u'Joe Last Name'
+    u.email_address = u'joe@blogcdb.com'
+    u.password = u'joesecret'
 
     model.DBSession.add(u)
 
     g = model.Group()
-    g.group_name = u'managers'
-    g.display_name = u'Managers Group'
+    g.group_name = u'couchdbusers'
+    g.display_name = u'Couchdb users Group'
 
     g.users.append(u)
 
     model.DBSession.add(g)
 
     p = model.Permission()
-    p.permission_name = u'manage'
-    p.description = u'This permission give an administrative right to the bearer'
+    p.permission_name = u'post'
+    p.description = u'This permission give post right to the bearer'
     p.groups.append(g)
 
     model.DBSession.add(p)
 
     u1 = model.User()
-    u1.user_name = u'editor'
-    u1.display_name = u'Example editor'
-    u1.email_address = u'editor@somedomain.com'
-    u1.password = u'editpass'
+    u1.user_name = u'Jane'
+    u1.display_name = u'Jane Last Name'
+    u1.email_address = u'jane@blogcdb.com'
+    u1.password = u'janesecret'
 
     model.DBSession.add(u1)
     model.DBSession.flush()

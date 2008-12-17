@@ -22,6 +22,7 @@ a {
 	height: 132px;
 	margin: 10px 10px 0 10px;
 	background: url('../images/headerbg.png') top left no-repeat;
+	background: #FFCC22;
 }
 
 #header h1 {
