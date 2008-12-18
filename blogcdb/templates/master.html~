@@ -37,6 +37,7 @@
     </div> 
     <div py:replace="select('*|text()')"/>
     <!-- End of main_content -->
+    ${footer()}
   </div>
 </body>
 </html>

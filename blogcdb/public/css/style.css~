@@ -40,7 +40,6 @@ a {
 	position: absolute;
 	left: 240px;
 	top: 70px;
-	color: #FF;
 }
 
 ul#mainmenu {
@@ -96,7 +95,7 @@ ul#mainmenu li.loginlogout a:hover
 }
 
 #content {
-	background: #fff url('../images/contentbg.png') left bottom no-repeat;
+	background: #fff; 
 	margin : 0 10px;
 	padding: 0 10px;
 }

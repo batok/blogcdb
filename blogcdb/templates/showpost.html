@@ -148,11 +148,11 @@
 		     dojo.require("dojox.widget.FisheyeLite");
 		     dojo.require("dojox.fx.easing");
 
-                     function preguntartag(){ 
+                     function askforatag(){ 
                        dijit.byId("dialog1").show();
                      } 
 
-                     function agregartag(postid){ 
+                     function addtag(postid){ 
 			window.location = "addtag?postid=" + postid + "&amp;tag=" + escape(dojo.byId("tag").value);
                      } 
 
@@ -213,9 +213,9 @@
 </head>
 <body class="tundra">
 <div dojoType="dijit.Dialog" id="dialog1" title="Agregando un Tag" jsId="dialog1"  >
- <div>Digite Tag o Categor&iacute;a
+ <div>Type a Tag
 	<div id="tag" dojoType="dijit.form.TextBox" uppercase="true" style="width: 120px" />
-	<button dojoType="dijit.form.Button" id="hazlo" onclick="agregartag('${postid}')">Ok</button>
+	<button dojoType="dijit.form.Button" id="hazlo" onclick="addtag('${postid}')">Ok</button>
  </div>
 </div>
 <div id="container">
@@ -262,11 +262,12 @@
 <tr><td>Subject</td><td>$subject</td></tr>
 <tr><td valign="top">Body</td><td class="box">${XML(postcontent)}</td></tr>
 <tr><td valign="top">Tags</td><td style="color: red">${"::".join(tags)}</td></tr>
-<tr py:if="tg.session.get('login', '') == author"><td>&nbsp;</td><td><button dojoType="dijit.form.Button" onclick="preguntartag()" style="size: 2px; color: #000000">Agregar Tag</button></td></tr>  
+<tr py:if="'TEST'  == author"><td>&nbsp;</td><td><button dojoType="dijit.form.Button" onclick="askforatag()" style="size: 2px; color: #000000">Add Tag</button></td></tr>  
 <span py:if="len(attachments) >0">
 <tr><td colspan="2" align="left" valign="top">Attachments</td></tr>
 <tr py:for="indice, attachment in enumerate(attachments)"><td>&nbsp;</td>
-<td>${attachment}</td>
+<td><img src="thumbnail?postid=${postid}&amp;${urls[indice]}" />
+<a href="download?postid=${postid}&amp;${urls[indice]}">${attachment}</a></td>
 </tr>
 </span>
 <span py:if="len(comments) >0">

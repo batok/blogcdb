@@ -1,3 +1,15 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="master.html" />
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
+  <title>Welcome to a blog which uses couchdb and tg2</title>
+
     <style type="text/css">
         #encabezadoTabla
         {
@@ -15,11 +27,11 @@
         }
     </style>
 <style type="text/css">
-        @import "static/javascript/dojo/dijit/themes/tundra/tundra.css";
-        @import "static/javascript/dojo/dojo/resources/dojo.css";
-        @import "static/javascript/dojo/dojox/image/resources/image.css";
+        @import "/javascript/dijit/themes/tundra/tundra.css";
+        @import "(javascript/dojo/resources/dojo.css";
+        @import "/javascript/dojox/image/resources/image.css";
     </style>
-           <script type="text/javascript" src="static/javascript/dojo/dojo/dojo.js" 
+           <script type="text/javascript" src="/javascript//dojo/dojo.js" 
                      djConfig="parseOnLoad: true"></script>
              <script type="text/javascript">
                      dojo.require("dojo.parser");
@@ -28,10 +40,10 @@
                      dojo.require("dijit.form.Button");
                      dojo.require("dijit.Editor");
                      function check_editor(evt) {
-                         content = dijit.byId('contenido').getValue(false);
+                         content = dijit.byId('contents').getValue(false);
                          if (! content) {
                               // you can easily replace this with a nicer dojo Dialog
-                             alert("Error! Llene el contenido primero!");
+                             alert("Don't leave this empty!");
                              // prevent the form from submitting
                              evt.preventDefault(); 
                          }
@@ -48,18 +60,18 @@
 
 </head>
 <body class="tundra">
-<a href="/" style="font-size: 10px">Regresar al Men&uacute; Principal</a>
-<h3 style="text-align: center; font-size: 14px;" >Bit&aacute;cora Iclar ( blog )</h3>
-<h4 style="text-align: center; font-size: 12px;" >Agregar Comentario sobre Mensaje</h4>
+<a href="/" style="font-size: 10px">Home</a>
+<h3 style="text-align: center; font-size: 14px;" >Blog</h3>
+<h4 style="text-align: center; font-size: 12px;" >Your comment</h4>
 <span align="center">
 <form method="post" action="savecomment" id="my_form">
 <input type="hidden" name="content_field" id="content_field"  />
 <input type="hidden" name="postid" value="${postid}"  />
 <table align="center">
-<tr><td>Comentario</td><td>
-<textarea id="contenido" dojoType="dijit.Editor" name="contenido" jsId="contenido" />
+<tr><td>Comment</td><td>
+<textarea id="contents" dojoType="dijit.Editor" name="contents" jsId="contents" />
 </td></tr>
-<tr><td colspan="2" align="center"><input type="submit" id="correcto" dojoType="dijit.form.Button" name="correcto" label="Datos Correctos" iconClass="plusIcon" /></td></tr>
+<tr><td colspan="2" align="center"><input type="submit" id="done" dojoType="dijit.form.Button" name="done" label="Ok" iconClass="plusIcon" /></td></tr>
 </table>
 </form>
 </span>

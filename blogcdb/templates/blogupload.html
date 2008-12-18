@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="master.html" />
+
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
+<title>Blog which uses couchdb and tg2</title>
+    <style type="text/css">
+        #encabezadoTabla
+        {
+            font-size: 10px;
+            text-align: center;
+            background-color: #C0C0C0;
+        }
+        #odd
+        {
+            background-color= #FFFFFF;
+        }
+        #even
+        {
+            background-color= #DDDDDD;
+        }
+    </style>
+
+</head>
+<body> 
+<a href="/" style="font-size: 10px">Home</a>
+<h3 style="text-align: center; font-size: 14px;" >Blog</h3>
+<h4 style="text-align: center; font-size: 12px;" >Attach a file to a blog post</h4>
+<form action="upload" method="POST" enctype="multipart/form-data">
+<input type="hidden" name="postid" value="${postid}"  />
+    <label for="upload_file">File to Attach :</label>
+    <input type="file" name="upload_file" id="upload_file"/>  <br/>
+    <input type="submit" name="submit_upload" value="attach"/>
+</form>
+</body></html>

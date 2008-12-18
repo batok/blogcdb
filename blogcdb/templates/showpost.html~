@@ -266,12 +266,13 @@
 <span py:if="len(attachments) >0">
 <tr><td colspan="2" align="left" valign="top">Attachments</td></tr>
 <tr py:for="indice, attachment in enumerate(attachments)"><td>&nbsp;</td>
-<td>${attachment}</td>
+<td><img src="thumbnail?postid=${postid}&amp;${urls[indice]}" />
+<a href="download?postid=${postid}&amp;${urls[indice]}">${attachment}</a></td>
 </tr>
 </span>
 <span py:if="len(comments) >0">
 <tr><td colspan="2" align="left" valign="top">Comments</td></tr>
-<tr py:for="comment in comments"><td>&nbsp;</td><td><hr/>${XML(comment["gravatar"])}&nbsp;${comment["comment_author"]}&nbsp;${comment["comment_date"]}<br/>${comment["comment"]}</td></tr>
+<tr py:for="comment in comments"><td>&nbsp;</td><td><hr/>${XML(comment["gravatar"])}&nbsp;${comment["comment_author"]}&nbsp;${comment["comment_date"]}<br/>${XML(comment["comment"])}</td></tr>
 </span>
 </table>
 </body></html>

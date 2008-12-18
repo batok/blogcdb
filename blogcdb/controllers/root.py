@@ -1,6 +1,6 @@
 """Main Controller"""
 from blogcdb.lib.base import BaseController
-from tg import expose, flash, require, redirect, session
+from tg import expose, flash, require, redirect, session, response
 from pylons.i18n import ugettext as _
 from repoze.what import predicates
 from blogcdb.controllers.secc import Secc
@@ -10,6 +10,8 @@ from couchdb.client import ResourceNotFound
 from hashlib import md5
 from datetime import datetime
 import urllib
+import cStringIO as StringIO
+from blogcdb.model import User
 
 class Post(sch.Document):
     author = sch.TextField()
@@ -28,7 +30,7 @@ class RootController(BaseController):
     secc = Secc()
 
     def getmail( self, user , format = "md5" ):
-	mail = "domingo.aguilera@gmail.com"
+	mail = "whitedwarfwillbeoursun@gmail.com"
         if format == "md5":
             email = md5(mail).hexdigest()
         else:
@@ -71,6 +73,10 @@ class RootController(BaseController):
     @expose(template="blogcdb.templates.postlist")
     #@require(predicates.has_permission('post'))
     def postlist(self , by_author = "",  tag = "", maxposts = "20", index = "1"):
+
+
+	usr = User.by_user_name("joe")
+	print "%s %s -- email : %s" % (usr.user_id,  usr.user_name, usr.email_address)
 
         blog = Server()["blog"]
         posts = []
@@ -125,7 +131,6 @@ class RootController(BaseController):
 
     @expose(template="blogcdb.templates.showpost")
     def getpost(self, postid = ""):
-	print session
         if postid:
             blog = Server()["blog"]
             p = Post.load(blog,postid) 
@@ -150,3 +155,67 @@ class RootController(BaseController):
             return dict(  page = "Showing post", author = p.author, postid = p.id , subject = p.subject, postcontent =  content, tags = p.tags , postdate = p.date, comments = comments, attachments = attachments, urls = urls, gravatar = self.getgravatar(p.author)  )
         return dict() 
 
+    @expose()
+    def addtag(self, tag="", postid = ""):
+
+	blog = Server()["blog"]
+        if tag and postid:
+            tag = tag.upper()
+            p = Post.load(blog, postid)
+            if tag not in ( p.tags ):
+                p.tags.append( tag )
+                p.store(blog)
+            redirect( "getpost?postid=%s" % postid)
+        redirect( "listposts" ) 
+
+    @expose()
+    def download(self, postid="", attachment=""):
+
+	blog = Server()["blog"]
+        if attachment and postid:
+            doc = blog[postid]
+            f = StringIO.StringIO(blog.get_attachment(doc, attachment))
+            response.headers["Content-Type"] = doc["_attachments"][attachment]["content_type"]
+            response.headers["Content-Disposition"] = "attachment; filename=" + attachment
+            return f.getvalue()
+
+        redirect("/")
+            
+    @expose()
+    def thumbnail(self, postid="", attachment=""):
+	blog = Server()["blog"]
+        if attachment and postid:
+            if attachment.endswith("jpg") or attachment.endswith("jpeg") or attachment.endswith("JPG") or attachment.endswith("JPEG"):
+                pass
+            else:
+            	redirect("/images/attachment-icon.jpg")
+
+            doc = blog[postid]
+            f = StringIO.StringIO(blog.get_attachment(doc, attachment))
+            f2 = StringIO.StringIO()
+            from PIL import Image
+            im = Image.open(f)
+            size = 64,64
+            im.thumbnail(size,Image.ANTIALIAS)
+            im.save(f2, "JPEG")            
+            response.headers["Content-Type"] = doc["_attachments"][attachment]["content_type"]
+            return f2.getvalue()
+        redirect("/")
+
+    @expose(template="blogcdb.templates.blogupload")
+    def blogupload(self, postid=""):
+        if not postid:
+            redirect("/")
+        return dict( page = "file attachment", postid = postid )
+
+    @expose()
+    def upload(self, postid = "", upload_file = "", submit_upload = ""):
+        if postid:
+            blog = Server()["blog"]
+            doc = blog[postid]
+            xfilename = upload_file.filename
+            filename = xfilename.split("\\")[-1]
+            f = StringIO.StringIO(upload_file.file.read())
+            blog.put_attachment(doc, f, filename)
+            redirect("getpost?postid=%s" % postid)
+        redirect("/")
