@@ -16,7 +16,7 @@ error_email_from = paste@localhost
 
 [server:main]
 use = egg:Paste#http
-host = 127.0.0.1 
+host = 192.168.2.2
 port = 8080
 
 [app:main]
