@@ -128,7 +128,7 @@ class RootController(BaseController):
     	@expose()
     	@require(predicates.has_permission('post'))
     	def savecomment(self, postid = "", content_field = "", **kw):
-        	user = "TEST"	
+		user = self.getuser()
         	if postid:
             		blog = Server()["blog"]
             		p = Post.load(blog,postid) 
