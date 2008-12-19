@@ -181,7 +181,7 @@ class RootController(BaseController):
             		if tag not in ( p.tags ):
                 		p.tags.append( tag )
                 		p.store(blog)
-            		redirect( "getpost?postid=%s" % postid)
+            		redirect( str(u"getpost?postid=%s" % postid))
         	redirect( "listposts" ) 
 
     	@expose()
