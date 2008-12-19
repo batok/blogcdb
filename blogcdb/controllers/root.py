@@ -1,6 +1,6 @@
 """Main Controller"""
 from blogcdb.lib.base import BaseController
-from tg import expose, flash, require, redirect, session, response
+from tg import expose, flash, require, redirect, session, response, request
 from pylons.i18n import ugettext as _
 from repoze.what import predicates
 from blogcdb.controllers.secc import Secc
@@ -28,9 +28,19 @@ class Post(sch.Document):
 class RootController(BaseController):
     
 	secc = Secc()
+	def getuser(self):
+		try:
+			return request.environ.get('repoze.who.identity')['repoze.who.userid']
+		except:
+			return ""
 
 	def getmail( self, user , format = "md5" ):
-		mail = "whitedwarfwillbeoursun@gmail.com"
+		try:
+			mail = User.by_user_name( user ).email_address
+			print mail
+		except:
+			mail = "whitedwarfwillbeoursun@gmail.com"
+
         	if format == "md5":
             		email = md5(mail).hexdigest()
         	else:
@@ -58,6 +68,7 @@ class RootController(BaseController):
         	return dict(page='login', header=lambda *arg: None, footer=lambda *arg: None, came_from=came_from)
 	
     	@expose("json")
+    	@require(predicates.has_permission('post'))
     	def tags(self):
 		blog = Server()["blog"]
         	tags = []
@@ -66,13 +77,17 @@ class RootController(BaseController):
         	return dict( identifier = "blogtag", items = tags )
 
 	@expose(template="blogcdb.templates.blogpost")
+    	@require(predicates.has_permission('post'))
     	def blogpost(self):
         	return dict(page = "New blog post")
 
+
+
     	@expose(template="blogcdb.templates.postlist")
-    	#@require(predicates.has_permission('post'))
+    	@require(predicates.has_permission('post'))
     	def postlist(self , by_author = "",  tag = "", maxposts = "20", index = "1"):
 
+		user = self.getuser()
 
 	        blog = Server()["blog"]
         	posts = []
@@ -97,8 +112,10 @@ class RootController(BaseController):
 		
 
     	@expose()
+    	@require(predicates.has_permission('post'))
     	def savepost(self, *args, **kwargs):
-		user = "TEST"
+
+		user = self.getuser()
         	blog = Server()["blog"]
         	p = Post( author = user, content = kwargs.get("content_field","Empty"), subject = kwargs.get("subject","Empty Subject"), date = datetime.now())
         	p.tags.append("GENERAL")
@@ -109,6 +126,7 @@ class RootController(BaseController):
 		redirect( "postlist")
     
     	@expose()
+    	@require(predicates.has_permission('post'))
     	def savecomment(self, postid = "", content_field = "", **kw):
         	user = "TEST"	
         	if postid:
@@ -120,12 +138,14 @@ class RootController(BaseController):
         	return dict() 
 
     	@expose(template="blogcdb.templates.blogcomment")
+    	@require(predicates.has_permission('post'))
     	def blogcomment(self, postid=""):
         	if not postid:
             		redirect("/")
         	return dict( page = "Blog Comment", postid = postid )
 
     	@expose(template="blogcdb.templates.showpost")
+    	@require(predicates.has_permission('post'))
     	def getpost(self, postid = ""):
         	if postid:
             		blog = Server()["blog"]
@@ -151,6 +171,7 @@ class RootController(BaseController):
         	return dict() 
 
     	@expose()
+    	@require(predicates.has_permission('post'))
     	def addtag(self, tag="", postid = ""):
 
         	if tag and postid:
@@ -164,6 +185,7 @@ class RootController(BaseController):
         	redirect( "listposts" ) 
 
     	@expose()
+    	@require(predicates.has_permission('post'))
     	def download(self, postid="", attachment=""):
 
 		blog = Server()["blog"]
@@ -177,6 +199,7 @@ class RootController(BaseController):
         	redirect("/")
             
     	@expose()
+    	@require(predicates.has_permission('post'))
     	def thumbnail(self, postid="", attachment=""):
         	if attachment and postid:
             		if attachment.endswith("jpg") or attachment.endswith("jpeg") or attachment.endswith("JPG") or attachment.endswith("JPEG"):
@@ -190,6 +213,7 @@ class RootController(BaseController):
             		f2 = StringIO.StringIO()
             		from PIL import Image
             		im = Image.open(f)
+			print im.size
             		size = 64,64
             		im.thumbnail(size,Image.ANTIALIAS)
             		im.save(f2, "JPEG")            
@@ -198,12 +222,14 @@ class RootController(BaseController):
         	redirect("/")
 
     	@expose(template="blogcdb.templates.blogupload")
+    	@require(predicates.has_permission('post'))
     	def blogupload(self, postid=""):
         	if not postid:
             		redirect("/")
         	return dict( page = "file attachment", postid = postid )
 
     	@expose()
+    	@require(predicates.has_permission('post'))
     	def upload(self, postid = "", upload_file = "", submit_upload = ""):
         	if postid:
             		blog = Server()["blog"]

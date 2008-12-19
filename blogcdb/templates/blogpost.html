@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
                       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
@@ -28,10 +29,10 @@
     </style>
 <style type="text/css">
         @import "/javascript/dijit/themes/tundra/tundra.css";
-        @import "(javascript/dojo/resources/dojo.css";
+        @import "/javascript/dojo/resources/dojo.css";
         @import "/javascript/dojox/image/resources/image.css";
     </style>
-           <script type="text/javascript" src="/javascript//dojo/dojo.js" 
+           <script type="text/javascript" src="javascript/dojo/dojo.js" 
                      djConfig="parseOnLoad: true"></script>
              <script type="text/javascript">
                      dojo.require("dojo.parser");
@@ -43,7 +44,7 @@
                          content = dijit.byId('contents').getValue(false);
                          if (! content) {
                               // you can easily replace this with a nicer dojo Dialog
-                             alert("Don't leave this empty!");
+                             alert("Don't leave this empty");
                              // prevent the form from submitting
                              evt.preventDefault(); 
                          }
@@ -62,16 +63,20 @@
 <body class="tundra">
 <a href="/" style="font-size: 10px">Home</a>
 <h3 style="text-align: center; font-size: 14px;" >Blog</h3>
-<h4 style="text-align: center; font-size: 12px;" >Your comment</h4>
+<h4 style="text-align: center; font-size: 12px;" >New Post</h4>
 <span align="center">
-<form method="post" action="savecomment" id="my_form">
+<form method="post" action="savepost" id="my_form">
 <input type="hidden" name="content_field" id="content_field"  />
-<input type="hidden" name="postid" value="${postid}"  />
 <table align="center">
-<tr><td>Comment</td><td>
+<tr><td>Subject</td><td align="left"><input id="asunto" align="left" dojoType="dijit.form.TextBox" style="text-align: left; width: 400px;" uppercase="true" name="subject" /></td></tr>
+<tr><td>Body</td><td>
 <textarea id="contents" dojoType="dijit.Editor" name="contents" jsId="contents" />
 </td></tr>
-<tr><td colspan="2" align="center"><input type="submit" id="done" dojoType="dijit.form.Button" name="done" label="Ok" iconClass="plusIcon" /></td></tr>
+<tr><td>Tag</td><td align="left">
+<input id="tag" dojoType="dijit.form.TextBox" uppercase="true" style="width: 150px" name="tag" />
+</td></tr>
+<tr><td colspan="2" id="tags"></td></tr>
+<tr><td colspan="2" align="center"><input type="submit" id="ok" dojoType="dijit.form.Button" name="ok" label="Ok" iconClass="plusIcon" /></td></tr>
 </table>
 </form>
 </span>

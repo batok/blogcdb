@@ -1,4 +1,4 @@
-"""Setup the blogcdb application"""
+"""Setup the boom application"""
 import logging
 
 import transaction
@@ -9,7 +9,7 @@ from blogcdb.config.environment import load_environment
 log = logging.getLogger(__name__)
 
 def setup_app(command, conf, vars):
-    """Place any commands to setup blogcdb here"""
+    """Place any commands to setup boom here"""
     load_environment(conf.global_conf, conf.local_conf)
     # Load the models
     from blogcdb import model
@@ -17,35 +17,35 @@ def setup_app(command, conf, vars):
     model.metadata.create_all(bind=config['pylons.app_globals'].sa_engine)
 
     u = model.User()
-    u.user_name = u'joe'
-    u.display_name = u'Joe Last Name'
-    u.email_address = u'joe@blogcdb.com'
-    u.password = u'joesecret'
-
+    u.user_name = u'peter'
+    u.display_name = u'Peter Smith'
+    u.email_address = u'peter@somedomain.com' #place a gravatar enabled email here
+    u.password = u'peterpass'
     model.DBSession.add(u)
 
+    u2 = model.User()
+    u2.user_name = u'paul'
+    u2.display_name = u'Paul Jones'
+    u2.email_address = u'paul@somedomain.com'
+    u2.password = u'paulpass'
+    model.DBSession.add(u2)
+
     g = model.Group()
-    g.group_name = u'couchdbusers'
-    g.display_name = u'Couchdb users Group'
+    g.group_name = u'blogusers'
+    g.display_name = u'Blog User Group'
 
     g.users.append(u)
+    g.users.append(u2)
 
     model.DBSession.add(g)
 
     p = model.Permission()
     p.permission_name = u'post'
-    p.description = u'This permission give post right to the bearer'
+    p.description = u'This permission give blog post usasge right to the bearer'
     p.groups.append(g)
 
     model.DBSession.add(p)
 
-    u1 = model.User()
-    u1.user_name = u'Jane'
-    u1.display_name = u'Jane Last Name'
-    u1.email_address = u'jane@blogcdb.com'
-    u1.password = u'janesecret'
-
-    model.DBSession.add(u1)
     model.DBSession.flush()
 
     transaction.commit()
