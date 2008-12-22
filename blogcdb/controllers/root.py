@@ -12,10 +12,17 @@ from datetime import datetime
 import urllib
 import cStringIO as StringIO
 from blogcdb.model import User
+from pylons import config
 
 def cdb():
 	couchdb_database = "blog"
 	couchdb_url = "http://127.0.0.1:5984"
+	try:
+		couchdb_database = config.get("couchdb.database",couchdb_database)
+		couchdb_url = config.get("couchdb.url",couchdb_url)
+	except:
+		print "There was an error getting configuration data"
+
 	return Server( couchdb_url )[couchdb_database]
 
 class Post(sch.Document):
