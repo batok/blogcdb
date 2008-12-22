@@ -14,6 +14,42 @@ import cStringIO as StringIO
 from blogcdb.model import User
 from pylons import config
 
+map_func_tags = """
+function(doc) {
+	for ( i in doc.tags) emit(doc.tags[i], 1);
+}
+"""
+
+reduce_func_tags = """
+function( keys, values) {
+	return sum(values);
+}
+"""
+
+map_func_attachments = """
+function(doc) {
+	for ( i in doc._attachments) emit(i, [doc._id, doc.author]);
+}
+"""
+
+map_func_by_author= """
+function(doc){
+	emit(doc.author, doc);
+}
+"""
+
+map_func_by_date= """
+function(doc){
+	emit(doc.date, doc);
+}
+"""
+
+map_func_all = """
+function(doc){
+	emit(null, doc);
+}
+"""
+
 def cdb():
 	couchdb_database = "blog"
 	couchdb_url = "http://127.0.0.1:5984"
@@ -24,6 +60,23 @@ def cdb():
 		print "There was an error getting configuration data"
 
 	return Server( couchdb_url )[couchdb_database]
+
+def createdatabase():
+	couchdb_database = "blog"
+	couchdb_url = "http://127.0.0.1:5984"
+	try:
+		couchdb_database = config.get("couchdb.database",couchdb_database)
+		couchdb_url = config.get("couchdb.url",couchdb_url)
+	except:
+		print "There was an error getting configuration data"
+
+	created = True
+	try:
+		Server( couchdb_url ).create(couchdb_database)
+	
+	except:
+		created = False
+	return created
 
 class Post(sch.Document):
 	author = sch.TextField()
@@ -36,6 +89,13 @@ class Post(sch.Document):
         	comment_date = sch.DateTimeField()
     	)))    
     	date = sch.DateTimeField()
+
+class Design( sch.Document):
+	by_author = sch.View("all", map_func_by_author) 
+	by_date = sch.View("all", map_func_by_date) 
+	all = sch.View("all", map_func_all) 
+	tags = sch.View("all", map_func_tags, reduce_func_tags) 
+	attachments = sch.View("all", map_func_attachments)
 
 class RootController(BaseController):
     
@@ -71,6 +131,18 @@ class RootController(BaseController):
 
     	@expose('blogcdb.templates.index')
     	def index(self):
+		if createdatabase():
+			from couchdb.design import ViewDefinition
+			blog = cdb()
+			ViewDefinition.sync_many( blog, [Design.all, Design.by_date, Design.by_author, Design.tags, Design.attachments])
+			p = Post()
+			p.author = "peter"
+			p.subject = "Welcome Blog Post"
+			p.content = "First Post by <b>Peter</b>."
+			p.date = datetime.now()
+			p.tags = ["GENERAL", "WELCOME"]
+			p.store(blog)
+
         	return dict(page='index')
 
 
