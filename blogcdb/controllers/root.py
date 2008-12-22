@@ -13,6 +13,11 @@ import urllib
 import cStringIO as StringIO
 from blogcdb.model import User
 
+def cdb():
+	couchdb_database = "blog"
+	couchdb_url = "http://127.0.0.1:5984"
+	return Server( couchdb_url )[couchdb_database]
+
 class Post(sch.Document):
 	author = sch.TextField()
 	subject = sch.TextField()
@@ -70,7 +75,7 @@ class RootController(BaseController):
     	@expose("json")
     	@require(predicates.has_permission('post'))
     	def tags(self):
-		blog = Server()["blog"]
+		blog = cdb()
         	tags = []
         	for row in blog.view("all/tags", group = True):
             		tags.append( dict( blogtag = row.key) )
@@ -89,7 +94,7 @@ class RootController(BaseController):
 
 		user = self.getuser()
 
-	        blog = Server()["blog"]
+		blog = cdb()
         	posts = []
         	view = "by_date"
         	if by_author:
@@ -116,7 +121,7 @@ class RootController(BaseController):
     	def savepost(self, *args, **kwargs):
 
 		user = self.getuser()
-        	blog = Server()["blog"]
+		blog = cdb()
         	p = Post( author = user, content = kwargs.get("content_field","Empty"), subject = kwargs.get("subject","Empty Subject"), date = datetime.now())
         	p.tags.append("GENERAL")
         	tag = kwargs.get("tag","")
@@ -130,7 +135,7 @@ class RootController(BaseController):
     	def savecomment(self, postid = "", content_field = "", **kw):
 		user = self.getuser()
         	if postid:
-            		blog = Server()["blog"]
+			blog = cdb()
             		p = Post.load(blog,postid) 
             		p.comments.append( dict(comment = content_field, comment_author = user, comment_date = datetime.now()) ) 
             		p.store(blog)
@@ -148,7 +153,7 @@ class RootController(BaseController):
     	@require(predicates.has_permission('post'))
     	def getpost(self, postid = ""):
         	if postid:
-            		blog = Server()["blog"]
+			blog = cdb()
             		p = Post.load(blog,postid) 
             		comments = []
 
@@ -175,7 +180,7 @@ class RootController(BaseController):
     	def addtag(self, tag="", postid = ""):
 
         	if tag and postid:
-			blog = Server()["blog"]
+			blog = cdb()
             		tag = tag.upper()
             		p = Post.load(blog, postid)
             		if tag not in ( p.tags ):
@@ -188,7 +193,7 @@ class RootController(BaseController):
     	@require(predicates.has_permission('post'))
     	def download(self, postid="", attachment=""):
 
-		blog = Server()["blog"]
+		blog = cdb()
         	if attachment and postid:
             		doc = blog[postid]
             		f = StringIO.StringIO(blog.get_attachment(doc, attachment))
@@ -206,8 +211,8 @@ class RootController(BaseController):
                 		pass
             		else:
             			redirect("/images/attachment-icon.jpg")
-			
-			blog = Server()["blog"]
+			blog = cdb()
+
             		doc = blog[postid]
             		f = StringIO.StringIO(blog.get_attachment(doc, attachment))
             		f2 = StringIO.StringIO()
@@ -239,7 +244,7 @@ class RootController(BaseController):
     	@require(predicates.has_permission('post'))
     	def upload(self, postid = "", upload_file = "", submit_upload = ""):
         	if postid:
-            		blog = Server()["blog"]
+			blog = cdb()
             		doc = blog[postid]
             		xfilename = upload_file.filename
             		filename = xfilename.split("\\")[-1]
