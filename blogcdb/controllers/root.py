@@ -134,7 +134,7 @@ class RootController(BaseController):
             		p = Post.load(blog,postid) 
             		p.comments.append( dict(comment = content_field, comment_author = user, comment_date = datetime.now()) ) 
             		p.store(blog)
-            		redirect("getpost?postid=%s" % postid)
+            		redirect( str(u"getpost?postid=%s" % postid))
         	return dict() 
 
     	@expose(template="blogcdb.templates.blogcomment")
@@ -213,8 +213,15 @@ class RootController(BaseController):
             		f2 = StringIO.StringIO()
             		from PIL import Image
             		im = Image.open(f)
-			print im.size
-            		size = 64,64
+			w, h = im.size
+			rh = int(h/64)
+			rw = int(w/64)
+			nw = nh = 64
+			if rw and rh:
+				nw = w / rw
+				nh = h / rh
+
+            		size = nw, nh
             		im.thumbnail(size,Image.ANTIALIAS)
             		im.save(f2, "JPEG")            
             		response.headers["Content-Type"] = doc["_attachments"][attachment]["content_type"]
@@ -238,5 +245,5 @@ class RootController(BaseController):
             		filename = xfilename.split("\\")[-1]
             		f = StringIO.StringIO(upload_file.file.read())
             		blog.put_attachment(doc, f, filename)
-            		redirect("getpost?postid=%s" % postid)
+            		redirect( str(u"getpost?postid=%s" % postid))
         	redirect("/")
