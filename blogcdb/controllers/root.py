@@ -85,10 +85,10 @@ class Post(sch.Document):
 	tags = sch.ListField( sch.TextField() )
 	comments = sch.ListField( sch.DictField(sch.Schema.build(
 		comment_author = sch.TextField(),
-        	comment = sch.TextField(),
-        	comment_date = sch.DateTimeField()
-    	)))    
-    	date = sch.DateTimeField()
+		comment = sch.TextField(),
+		comment_date = sch.DateTimeField()
+	)))    
+	date = sch.DateTimeField()
 
 class Design( sch.Document):
 	by_author = sch.View("all", map_func_by_author) 
@@ -122,12 +122,12 @@ class RootController(BaseController):
     	def getgravatar( self, user = "", size = "30"):
         	html = "<span>&nbsp;</span>"
         	if user:
-            		hash = self.getmail( user )
-            		mail = self.getmail( user, "foo")
-            	if mail:
-            		html = "<img src='http://www.gravatar.com/avatar/%s?s=%s' />" % ( hash, size ) 
+ 			hash = self.getmail( user )
+			mail = self.getmail( user, "foo")
+ 		if mail:
+ 			html = "<img src='http://www.gravatar.com/avatar/%s?s=%s' />" % ( hash, size ) 
                 
-        	return html
+ 		return html
 
     	@expose('blogcdb.templates.index')
     	def index(self):
@@ -143,160 +143,159 @@ class RootController(BaseController):
 			p.tags = ["GENERAL", "WELCOME"]
 			p.store(blog)
 
-        	return dict(page='index')
+		return dict(page='index')
 
 
-    	@expose('blogcdb.templates.login')
-    	def login(self, **kw):
-        	came_from = kw.get('came_from', '/')
-        	return dict(page='login', header=lambda *arg: None, footer=lambda *arg: None, came_from=came_from)
+	@expose('blogcdb.templates.login')
+	def login(self, **kw):
+		came_from = kw.get('came_from', '/')
+		return dict(page='login', header=lambda *arg: None, footer=lambda *arg: None, came_from=came_from)
 	
-    	@expose("json")
-    	@require(predicates.has_permission('post'))
-    	def tags(self):
+	@expose("json")
+	@require(predicates.has_permission('post'))
+	def tags(self):
 		blog = cdb()
         	tags = []
         	for row in blog.view("all/tags", group = True):
             		tags.append( dict( blogtag = row.key) )
-        	return dict( identifier = "blogtag", items = tags )
+		return dict( identifier = "blogtag", items = tags )
 
 	@expose(template="blogcdb.templates.blogpost")
-    	@require(predicates.has_permission('post'))
-    	def blogpost(self):
-        	return dict(page = "New blog post")
+	@require(predicates.has_permission('post'))
+	def blogpost(self):
+		return dict(page = "New blog post")
 
 
-
-    	@expose(template="blogcdb.templates.postlist")
-    	@require(predicates.has_permission('post'))
-    	def postlist(self , by_author = "",  tag = "", maxposts = "20", index = "1"):
+	@expose(template="blogcdb.templates.postlist")
+	@require(predicates.has_permission('post'))
+	def postlist(self , by_author = "",  tag = "", maxposts = "20", index = "1"):
 
 		user = self.getuser()
 
 		blog = cdb()
-        	posts = []
-        	view = "by_date"
-        	if by_author:
-            		view = "by_author"
-            		blogview = blog.view('all/%s' % view, key =  by_author, count = int(maxposts) )
-        	else:
-            		blogview = blog.view("all/%s" % view, descending = True, count = int(maxposts) )
-        	howmany = 0   
-        	for row in blogview:
-            		howmany += 1
-            		if howmany > int(maxposts):
-                		break		
-            		goodOne = True
-            		if tag:
-                		if not tag in row.value["tags"]:
-                   			 goodOne = False
-            		if goodOne:   
-                		posts.append(dict(author = row.value["author"], postid = row.value["_id"], subject = row.value["subject"], content = row.value["content"], postdate = row.value["date"], gravatar = self.getgravatar(row.value["author"])))
-        	return dict(  page = "postlist", posts = posts, by_author = by_author, tag = tag, newindex = int(index) + howmany)
+		posts = []
+		view = "by_date"
+		if by_author:
+			view = "by_author"
+			blogview = blog.view('all/%s' % view, key =  by_author, count = int(maxposts) )
+		else:
+			blogview = blog.view("all/%s" % view, descending = True, count = int(maxposts) )
+		howmany = 0   
+		for row in blogview:
+			howmany += 1
+			if howmany > int(maxposts):
+				break		
+			goodOne = True
+			if tag:
+				if not tag in row.value["tags"]:
+					goodOne = False
+			if goodOne:   
+				posts.append(dict(author = row.value["author"], postid = row.value["_id"], subject = row.value["subject"], content = row.value["content"], postdate = row.value["date"], gravatar = self.getgravatar(row.value["author"])))
+		return dict(  page = "postlist", posts = posts, by_author = by_author, tag = tag, newindex = int(index) + howmany)
 		
 
-    	@expose()
-    	@require(predicates.has_permission('post'))
-    	def savepost(self, *args, **kwargs):
+	@expose()
+	@require(predicates.has_permission('post'))
+	def savepost(self, *args, **kwargs):
 
 		user = self.getuser()
 		blog = cdb()
-        	p = Post( author = user, content = kwargs.get("content_field","Empty"), subject = kwargs.get("subject","Empty Subject"), date = datetime.now())
-        	p.tags.append("GENERAL")
-        	tag = kwargs.get("tag","")
-        	if tag:
-            		p.tags.append(tag)
-        	p.store(blog)
+		p = Post( author = user, content = kwargs.get("content_field","Empty"), subject = kwargs.get("subject","Empty Subject"), date = datetime.now())
+		p.tags.append("GENERAL")
+		tag = kwargs.get("tag","")
+		if tag:
+			p.tags.append(tag)
+		p.store(blog)
 		redirect( "postlist")
     
-    	@expose()
-    	@require(predicates.has_permission('post'))
-    	def savecomment(self, postid = "", content_field = "", **kw):
+	@expose()
+	@require(predicates.has_permission('post'))
+	def savecomment(self, postid = "", content_field = "", **kw):
 		user = self.getuser()
-        	if postid:
+		if postid:
 			blog = cdb()
-            		p = Post.load(blog,postid) 
-            		p.comments.append( dict(comment = content_field, comment_author = user, comment_date = datetime.now()) ) 
-            		p.store(blog)
-            		redirect( str(u"getpost?postid=%s" % postid))
-        	return dict() 
+			p = Post.load(blog,postid) 
+			p.comments.append( dict(comment = content_field, comment_author = user, comment_date = datetime.now()) ) 
+			p.store(blog)
+			redirect( str(u"getpost?postid=%s" % postid))
+	return dict() 
 
-    	@expose(template="blogcdb.templates.blogcomment")
-    	@require(predicates.has_permission('post'))
-    	def blogcomment(self, postid=""):
-        	if not postid:
-            		redirect("/")
-        	return dict( page = "Blog Comment", postid = postid )
+	@expose(template="blogcdb.templates.blogcomment")
+	@require(predicates.has_permission('post'))
+	def blogcomment(self, postid=""):
+		if not postid:
+			redirect("/")
+		return dict( page = "Blog Comment", postid = postid )
 
-    	@expose(template="blogcdb.templates.showpost")
-    	@require(predicates.has_permission('post'))
-    	def getpost(self, postid = ""):
-        	if postid:
+	@expose(template="blogcdb.templates.showpost")
+	@require(predicates.has_permission('post'))
+	def getpost(self, postid = ""):
+		if postid:
 			blog = cdb()
-            		p = Post.load(blog,postid) 
-            		comments = []
+			p = Post.load(blog,postid) 
+			comments = []
 
-            		if p.comments:
-                		comments = p.comments 
-	    		for x in range(len(comments)):
-                		cual = comments[x]
-                		cual["gravatar"] = self.getgravatar( cual["comment_author"])
-	    			cual["comment"] = u"<div>{0}</div>".format(cual["comment"])
-            		p2 = blog[postid]
-            		urls = []
-            		try:
-                		attachments = p2["_attachments"].keys()
-		        except:
-                		attachments= []
-            		for attachment in attachments:
-                		urls.append(urllib.urlencode(dict(attachment= attachment)))
-	    		content = u"<div>{0}</div>".format(p.content)
-            		return dict(  page = "Showing post", author = p.author, postid = p.id , subject = p.subject, postcontent =  content, tags = p.tags , postdate = p.date, comments = comments, attachments = attachments, urls = urls, gravatar = self.getgravatar(p.author)  )
-        	return dict() 
+			if p.comments:
+				comments = p.comments
+			for x in range(len(comments)):
+				cual = comments[x]
+				cual["gravatar"] = self.getgravatar( cual["comment_author"])
+				cual["comment"] = u"<div>{0}</div>".format(cual["comment"])
+			p2 = blog[postid]
+			urls = []
+			try:
+				attachments = p2["_attachments"].keys()
+			except:
+				attachments= []
+			for attachment in attachments:
+				urls.append(urllib.urlencode(dict(attachment= attachment)))
+			content = u"<div>{0}</div>".format(p.content)
+			return dict(  page = "Showing post", author = p.author, postid = p.id , subject = p.subject, postcontent =  content, tags = p.tags , postdate = p.date, comments = comments, attachments = attachments, urls = urls, gravatar = self.getgravatar(p.author)  )
+		return dict() 
 
-    	@expose()
-    	@require(predicates.has_permission('post'))
-    	def addtag(self, tag="", postid = ""):
+	@expose()
+	@require(predicates.has_permission('post'))
+	def addtag(self, tag="", postid = ""):
 
-        	if tag and postid:
+		if tag and postid:
 			blog = cdb()
-            		tag = tag.upper()
-            		p = Post.load(blog, postid)
-            		if tag not in ( p.tags ):
-                		p.tags.append( tag )
-                		p.store(blog)
-            		redirect( str(u"getpost?postid=%s" % postid))
-        	redirect( "listposts" ) 
+			tag = tag.upper()
+			p = Post.load(blog, postid)
+			if tag not in ( p.tags ):
+				p.tags.append( tag )
+				p.store(blog)
+			redirect( str(u"getpost?postid=%s" % postid))
+		redirect( "listposts" ) 
 
-    	@expose()
-    	@require(predicates.has_permission('post'))
-    	def download(self, postid="", attachment=""):
+	@expose()
+	@require(predicates.has_permission('post'))
+	def download(self, postid="", attachment=""):
 
 		blog = cdb()
-        	if attachment and postid:
-            		doc = blog[postid]
-            		f = StringIO.StringIO(blog.get_attachment(doc, attachment))
-            		response.headers["Content-Type"] = doc["_attachments"][attachment]["content_type"]
-            		response.headers["Content-Disposition"] = "attachment; filename=" + attachment
-            		return f.getvalue()
+		if attachment and postid:
+			doc = blog[postid]
+			f = StringIO.StringIO(blog.get_attachment(doc, attachment))
+			response.headers["Content-Type"] = doc["_attachments"][attachment]["content_type"]
+			response.headers["Content-Disposition"] = "attachment; filename=" + attachment
+			return f.getvalue()
 
-        	redirect("/")
+		redirect("/")
             
-    	@expose()
-    	@require(predicates.has_permission('post'))
-    	def thumbnail(self, postid="", attachment=""):
-        	if attachment and postid:
-            		if attachment.endswith("jpg") or attachment.endswith("jpeg") or attachment.endswith("JPG") or attachment.endswith("JPEG"):
-                		pass
-            		else:
-            			redirect("/images/attachment-icon.jpg")
+	@expose()
+	@require(predicates.has_permission('post'))
+	def thumbnail(self, postid="", attachment=""):
+		if attachment and postid:
+			if attachment.endswith("jpg") or attachment.endswith("jpeg") or attachment.endswith("JPG") or attachment.endswith("JPEG"):
+				pass
+			else:
+				redirect("/images/attachment-icon.jpg")
 			blog = cdb()
 
-            		doc = blog[postid]
-            		f = StringIO.StringIO(blog.get_attachment(doc, attachment))
-            		f2 = StringIO.StringIO()
-            		from PIL import Image
-            		im = Image.open(f)
+			doc = blog[postid]
+			f = StringIO.StringIO(blog.get_attachment(doc, attachment))
+			f2 = StringIO.StringIO()
+			from PIL import Image
+			im = Image.open(f)
 			w, h = im.size
 			rh = int(h/64)
 			rw = int(w/64)
@@ -305,29 +304,29 @@ class RootController(BaseController):
 				nw = w / rw
 				nh = h / rh
 
-            		size = nw, nh
-            		im.thumbnail(size,Image.ANTIALIAS)
-            		im.save(f2, "JPEG")            
-            		response.headers["Content-Type"] = doc["_attachments"][attachment]["content_type"]
-            		return f2.getvalue()
-        	redirect("/")
+			size = nw, nh
+			im.thumbnail(size,Image.ANTIALIAS)
+			im.save(f2, "JPEG")            
+			response.headers["Content-Type"] = doc["_attachments"][attachment]["content_type"]
+			return f2.getvalue()
+		redirect("/")
 
-    	@expose(template="blogcdb.templates.blogupload")
-    	@require(predicates.has_permission('post'))
-    	def blogupload(self, postid=""):
-        	if not postid:
-            		redirect("/")
-        	return dict( page = "file attachment", postid = postid )
+	@expose(template="blogcdb.templates.blogupload")
+	@require(predicates.has_permission('post'))
+	def blogupload(self, postid=""):
+		if not postid:
+			redirect("/")
+		return dict( page = "file attachment", postid = postid )
 
-    	@expose()
-    	@require(predicates.has_permission('post'))
-    	def upload(self, postid = "", upload_file = "", submit_upload = ""):
-        	if postid:
+	@expose()
+	@require(predicates.has_permission('post'))
+	def upload(self, postid = "", upload_file = "", submit_upload = ""):
+		if postid:
 			blog = cdb()
-            		doc = blog[postid]
-            		xfilename = upload_file.filename
-            		filename = xfilename.split("\\")[-1]
-            		f = StringIO.StringIO(upload_file.file.read())
-            		blog.put_attachment(doc, f, filename)
-            		redirect( str(u"getpost?postid=%s" % postid))
-        	redirect("/")
+			doc = blog[postid]
+			xfilename = upload_file.filename
+			filename = xfilename.split("\\")[-1]
+			f = StringIO.StringIO(upload_file.file.read())
+			blog.put_attachment(doc, f, filename)
+			redirect( str(u"getpost?postid=%s" % postid))
+		redirect("/")
