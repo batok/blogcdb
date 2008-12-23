@@ -218,7 +218,7 @@ class RootController(BaseController):
 			p.comments.append( dict(comment = content_field, comment_author = user, comment_date = datetime.now()) ) 
 			p.store(blog)
 			redirect( str(u"getpost?postid=%s" % postid))
-	return dict() 
+		return dict() 
 
 	@expose(template="blogcdb.templates.blogcomment")
 	@require(predicates.has_permission('post'))
