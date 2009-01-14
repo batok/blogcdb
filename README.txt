@@ -1,6 +1,3 @@
-This file is for you to describe the blogcdb application. Typically
-you would include information such as the information below:
-
 Installation and Setup
 ======================
 
