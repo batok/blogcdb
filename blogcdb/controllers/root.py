@@ -179,7 +179,7 @@ class RootController(BaseController):
 			view = "by_author"
 			blogview = blog.view('all/%s' % view, key =  by_author, count = int(maxposts) )
 		else:
-			blogview = blog.view("all/%s" % view, descending = True, count = int(maxposts) )
+			blogview = blog.view("all/%s" % view, descending = True, limit = int(maxposts) )
 		howmany = 0   
 		for row in blogview:
 			howmany += 1
